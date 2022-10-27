@@ -5,10 +5,8 @@ const $searchForm = document.querySelector(".search-form");
 const $searchInput = document.querySelector(".search");
 const $suggestions = document.querySelector(".suggestions");
 const initialLi = $suggestions.textContent.trim().split("\n");
-console.log(initialLi);
 const initList = () => {
-  for (text of initialLi) {
-    console.log(text);
+  for (const text of initialLi) {
     const $li = document.createElement("li");
     $li.textContent = text.trim();
     $suggestions.appendChild($li);
@@ -18,6 +16,17 @@ const initList = () => {
 const findList = (keyword) => {
   const re = new RegExp(`${keyword}`, "gi");
   return data.filter((v) => v.city.match(re) || v.state.match(re));
+};
+
+const addComma = (string) => {
+  const arr = string.split("");
+  arr.splice(-3, 0, ",");
+  let n = 6;
+  while (string.length > n) {
+    arr.splice(-n - 1, 0, ",");
+    n *= 2;
+  }
+  return arr.join("");
 };
 
 const paintList = (e) => {
@@ -33,10 +42,10 @@ const paintList = (e) => {
     const $leftSpan = document.createElement("span");
     const $rightSpan = document.createElement("span");
     $leftSpan.textContent = `${list.city}, ${list.state}`;
-    $rightSpan.textContent =
-      list.population.length > 3
-        ? list.population.split("").splice(-3, 0, ",").join("")
-        : list.population;
+    $rightSpan.textContent = "";
+    if (list.population.length > 3)
+      $rightSpan.textContent = addComma(list.population);
+    else $rightSpan.textContent = list.population;
     $li.appendChild($leftSpan);
     $li.appendChild($rightSpan);
     $suggestions.insertAdjacentElement("beforeend", $li);
