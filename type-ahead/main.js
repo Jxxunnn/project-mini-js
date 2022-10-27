@@ -3,6 +3,18 @@ const endpoint =
 const data = await fetch(endpoint).then((res) => res.json());
 const $searchForm = document.querySelector(".search-form");
 const $searchInput = document.querySelector(".search");
+const $suggestions = document.querySelector(".suggestions");
+const initialLi = $suggestions.textContent.trim().split("\n");
+console.log(initialLi);
+const initList = () => {
+  for (text of initialLi) {
+    console.log(text);
+    const $li = document.createElement("li");
+    $li.textContent = text.trim();
+    $suggestions.appendChild($li);
+  }
+};
+
 const findList = (keyword) => {
   const re = new RegExp(`${keyword}`, "gi");
   return data.filter((v) => v.city.match(re) || v.state.match(re));
@@ -10,15 +22,25 @@ const findList = (keyword) => {
 
 const paintList = (e) => {
   const keyword = e.target.value;
+  $suggestions.textContent = "";
+  if (!e.target.value) {
+    initList();
+    return;
+  }
   const filtered = findList(keyword);
   for (const list of filtered) {
     const $li = document.createElement("li");
     const $leftSpan = document.createElement("span");
     const $rightSpan = document.createElement("span");
     $leftSpan.textContent = `${list.city}, ${list.state}`;
-    //  $rightSpan.textContent =
+    $rightSpan.textContent =
+      list.population.length > 3
+        ? list.population.split("").splice(-3, 0, ",").join("")
+        : list.population;
+    $li.appendChild($leftSpan);
+    $li.appendChild($rightSpan);
+    $suggestions.insertAdjacentElement("beforeend", $li);
   }
-  console.log(data[9]);
 };
 
 $searchInput.addEventListener("input", paintList);
