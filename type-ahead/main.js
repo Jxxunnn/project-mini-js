@@ -12,19 +12,23 @@ const initList = () => {
     $suggestions.appendChild($li);
   }
 };
-
 const findList = (keyword) => {
   const re = new RegExp(`${keyword}`, "gi");
   return data.filter((v) => v.city.match(re) || v.state.match(re));
 };
-
+const highlight = (keyword, content, element) => {
+  const re = new RegExp(`${keyword}`, "gi");
+  if (re.test(content)) {
+    element.innerHTML = content.replaceAll(re, `<mark>${keyword}</mark>`);
+  }
+};
 const addComma = (string) => {
   const arr = string.split("");
   arr.splice(-3, 0, ",");
   let n = 6;
   while (string.length > n) {
     arr.splice(-n - 1, 0, ",");
-    n *= 2;
+    n += 3;
   }
   return arr.join("");
 };
@@ -42,6 +46,7 @@ const paintList = (e) => {
     const $leftSpan = document.createElement("span");
     const $rightSpan = document.createElement("span");
     $leftSpan.textContent = `${list.city}, ${list.state}`;
+    highlight(keyword, $leftSpan.textContent, $leftSpan);
     $rightSpan.textContent = "";
     if (list.population.length > 3)
       $rightSpan.textContent = addComma(list.population);
@@ -53,7 +58,3 @@ const paintList = (e) => {
 };
 
 $searchInput.addEventListener("input", paintList);
-
-//지금 이미 인구순으로 되어있어.
-//지금 필요한 게 city랑 population이랑 state
-//입력 값을 받으면 list 초기화한 다음에 필터링된 녀석들 인구순으로 주르루룩
