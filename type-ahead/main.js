@@ -14,10 +14,12 @@ const initList = () => {
 };
 const findList = (keyword) => {
   const re = new RegExp(`${keyword}`, "gi");
-  return data.filter((v) => v.city.match(re) || v.state.match(re));
+  // 구조분해할당을 배열 메소드에서? 개신기
+  return data.filter(({ city, state }) => city.match(re) || state.match(re));
 };
 const highlight = (keyword, content, element) => {
   const re = new RegExp(`${keyword}`, "gi");
+  // 아 씨 innerHTML 쓰기 싫었는데
   if (re.test(content)) {
     element.innerHTML = content.replaceAll(re, `<mark>${keyword}</mark>`);
   }
@@ -32,7 +34,6 @@ const addComma = (string) => {
   }
   return arr.join("");
 };
-
 const paintList = (e) => {
   const keyword = e.target.value;
   $suggestions.textContent = "";
@@ -41,16 +42,17 @@ const paintList = (e) => {
     return;
   }
   const filtered = findList(keyword);
-  for (const list of filtered) {
+  // 구조분해할당 개꿀
+  for (const { city, population, state } of filtered) {
     const $li = document.createElement("li");
     const $leftSpan = document.createElement("span");
     const $rightSpan = document.createElement("span");
-    $leftSpan.textContent = `${list.city}, ${list.state}`;
+    $leftSpan.textContent = `${city}, ${state}`;
     highlight(keyword, $leftSpan.textContent, $leftSpan);
     $rightSpan.textContent = "";
-    if (list.population.length > 3)
-      $rightSpan.textContent = addComma(list.population);
-    else $rightSpan.textContent = list.population;
+    // 컨트롤 d 메모
+    if (population.length > 3) $rightSpan.textContent = addComma(population);
+    else $rightSpan.textContent = population;
     $li.appendChild($leftSpan);
     $li.appendChild($rightSpan);
     $suggestions.insertAdjacentElement("beforeend", $li);
